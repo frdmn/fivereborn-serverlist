@@ -11,9 +11,8 @@ var masterclient_timeout = 1000;
 var client_timeout = 200;
 
 // Function to convert an integer into an IP string (X.X.X.X)
-function ip_to_str(ip_int){
-    var ip_str = "";
-    ip_str += ((ip_int >> 24) & 0xFF).toString() + ".";
+var ip_to_str = function(ip_int){
+    var ip_str = ((ip_int >> 24) & 0xFF).toString() + ".";
     ip_str += ((ip_int >> 16) & 0xFF).toString() + ".";
     ip_str += ((ip_int >>  8) & 0xFF).toString() + ".";
     ip_str += ((ip_int >>  0) & 0xFF).toString();
