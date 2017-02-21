@@ -1,22 +1,24 @@
 // Require modules
-var raw = require ("raw-socket");
-var dgram = require('dgram');
-var async = require('async');
+var raw = require ('raw-socket'),
+    dgram = require('dgram'),
+    async = require('async');
 
 // FiveM dpmaster server
-var fivem_host = "updater.fivereborn.com";
-var fivem_port = "30110";
+var fivem_host = 'updater.fivereborn.com',
+    fivem_port = '30110';
 
 // Timout configuration
-var masterclient_timeout = 1000;
-var client_timeout = 200;
+var masterclient_timeout = 1000,
+    client_timeout = 200;
 
 // Function to convert an integer into an IP string (X.X.X.X)
 var ip_to_str = function(ip_int){
-    var ip_str = ((ip_int >> 24) & 0xFF).toString() + ".";
-    ip_str += ((ip_int >> 16) & 0xFF).toString() + ".";
-    ip_str += ((ip_int >>  8) & 0xFF).toString() + ".";
+    var ip_str = ((ip_int >> 24) & 0xFF).toString() + '.';
+    ip_str += ((ip_int >> 16) & 0xFF).toString() + '.';
+    ip_str += ((ip_int >>  8) & 0xFF).toString() + '.';
     ip_str += ((ip_int >>  0) & 0xFF).toString();
+
+    // Return constructed string
     return ip_str;
 }
 
@@ -31,7 +33,7 @@ var queryAvailableServers = function(callback) {
     // Combine into one header
     header = new Buffer.concat([padding, command]);
 
-    // Array that holds server+port combinations
+    // Empty array that holds server+port combinations
     var serverList = [];
 
     // Create UDP socket
@@ -91,12 +93,14 @@ var getServerInfo = function(server, port, callback) {
     // Set timeout of 1 second
     var timeout = setTimeout(function() {
         client.close();
-        callback();
+        callback(false);
     }, client_timeout);
 
     // Process response from server
     client.on('message', function (message, remote) {
-        message = message.slice(18); // Slice "\ff\ff\ff\ffinfoResponse\n\\"
+        // Slice "\ff\ff\ff\ffinfoResponse\n\\"
+        message = message.slice(18);
+        // Close connection, clear timer and call callback
         client.close();
         clearTimeout(timeout);
         callback(message);
@@ -104,16 +108,23 @@ var getServerInfo = function(server, port, callback) {
 };
 
 queryAvailableServers(function(serverlist){
+    // Empty array that holds the server information
     var serverArray = [];
 
+    // For each server, execute getServerInfo (synchronously)
     async.forEachSeries(serverlist, function(server, callback) {
+        // Split by ":"
         var socket = server.split(':');
 
+        // Get server information for current server
         getServerInfo(socket[0], socket[1], function(data){
-            if (!data) return callback()
-            var parts = data.toString().split("\\");
-            var serverDetails = {};
+            // Abort if callback is
+            if (!data) return callback();
+            // Split buffer by "\\" separator
+            var parts = data.toString().split('\\'),
+                serverDetails = {};
 
+            // For each element, even = key; off = value
             for(var i = 0; i < parts.length; i += 2) {  // take every second element
                 var key = parts[i];
                 var value = parts[i+1];
@@ -122,11 +133,12 @@ queryAvailableServers(function(serverlist){
 
             console.log(serverDetails);
 
+            // Push to serverDetails
             serverArray.push(serverDetails);
             callback();
         });
     }, function(err) {
-        if (err) return err;
+        if (err) throw err;
         console.log(serverArray);
     });
 });
