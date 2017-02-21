@@ -146,9 +146,7 @@ var getServerInfo = function(server, port, callback) {
         var parts = message.toString().split('\\'),
             serverDetails = {};
 
-        // Inject address and port
-        serverDetails.address = server;
-        serverDetails.port = port;
+        // Inject responsetime
         serverDetails.responsetime = new Date() - start;
 
         // For each element, even = key; off = value
@@ -170,27 +168,29 @@ var getServerInfo = function(server, port, callback) {
 // Run function to get all servers
 queryAvailableServers(function(serverlist){
     // Empty array that holds the server information
-    var serverArray = [];
+    var serversObject = {};
 
     // For each server, execute getServerInfo (synchronously)
     async.forEachSeries(serverlist, function(server, callback) {
-        // Split by ":"
-        var socket = server.split(':');
+        // Split by ":" and store in variables
+        var socket = server.split(':'),
+            server = socket[0],
+            port = socket[1];
 
         // Get server information for current server
-        getServerInfo(socket[0], socket[1], function(data){
-            // Abort if callback is
+        getServerInfo(server, port, function(data){
+            // Abort if callback is false
             if (!data) return callback();
 
             // console.log(data);
 
             // Push to serverDetails
-            serverArray.push(data);
+            serversObject[server + ':' + port] = data;
             callback();
         });
     }, function(err) {
         if (err) throw err;
         // Print result as formatted JSON
-        console.log(JSON.stringify(serverArray, null, 4));
+        console.log(JSON.stringify(serversObject, null, 4));
     });
 });
