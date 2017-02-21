@@ -153,8 +153,10 @@ var getServerInfo = function(server, port, callback) {
 
         // For each element, even = key; off = value
         for(var i = 0; i < parts.length; i += 2) {
-            var key = parts[i];
-            var value = parts[i+1];
+            var key = parts[i],
+                value = parts[i+1];
+
+            // Transfer value into key
             serverDetails[key] = value;
         }
 
