@@ -1,6 +1,7 @@
 // Require modules
 var raw = require ("raw-socket");
 var dgram = require('dgram');
+var async = require('async');
 
 // FiveM dpmaster server
 var fivem_host = "151.80.44.223";
@@ -84,12 +85,13 @@ var getServerInfo = function(server, port, callback) {
     // Send UDP packet
     client.send(header, 0, header.length, port, server, function(err, bytes) {
         if (err) throw err;
-        console.log('UDP message sent to ' + server +':'+ port);
+        // console.log('UDP message sent to ' + server +':'+ port);
     });
 
     // Set timeout of 1 second
     var timeout = setTimeout(function() {
         client.close();
+        callback();
     }, client_timeout);
 
     // Process response from server
@@ -101,11 +103,14 @@ var getServerInfo = function(server, port, callback) {
     });
 };
 
-queryAvailableServers(function(data){
-    for (var i = 0; i < data.length; i++) {
-        socket = data[i].split(':');
+queryAvailableServers(function(serverlist){
+    var serverArray = [];
+
+    async.forEachSeries(serverlist, function(server, callback) {
+        var socket = server.split(':');
 
         getServerInfo(socket[0], socket[1], function(data){
+            if (!data) return callback()
             var parts = data.toString().split("\\");
             var serverDetails = {};
 
@@ -116,6 +121,12 @@ queryAvailableServers(function(data){
             }
 
             console.log(serverDetails);
+
+            serverArray.push(serverDetails);
+            callback();
         });
-    }
+    }, function(err) {
+        if (err) return err;
+        console.log(serverArray);
+    });
 });
