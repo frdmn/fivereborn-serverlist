@@ -190,6 +190,7 @@ queryAvailableServers(function(serverlist){
         });
     }, function(err) {
         if (err) throw err;
-        console.log(serverArray);
+        // Print result as formatted JSON
+        console.log(JSON.stringify(serverArray, null, 4));
     });
 });
