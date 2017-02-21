@@ -4,7 +4,7 @@ var dgram = require('dgram');
 var async = require('async');
 
 // FiveM dpmaster server
-var fivem_host = "151.80.44.223";
+var fivem_host = "updater.fivereborn.com";
 var fivem_port = "30110";
 
 // Timout configuration
