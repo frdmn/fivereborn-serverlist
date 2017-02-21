@@ -15,8 +15,8 @@ var masterclient_timeout = 1000,
 
 /**
  * Convert an integer into an IP string (x.x.x.x)
- * @param  {integer} ip_int
- * @return {string}
+ * @param  {Integer} ip_int
+ * @return {String}
  */
 var ip_to_str = function(ip_int){
     var ip_str = ((ip_int >> 24) & 0xFF).toString() + '.';
@@ -32,8 +32,8 @@ var ip_to_str = function(ip_int){
  * Query the GTA5 dpmaster server to get a list of available
  * game servers. Returns an array that holds each server and
  * port separated by ":".
- * @param  {function} callback
- * @return {array}
+ * @param  {Function} callback
+ * @return {Array}
  * @example
  * [
  *   '123.124.125.126:30120'
@@ -165,6 +165,7 @@ var getServerInfo = function(server, port, callback) {
     });
 };
 
+// Run function to get all servers
 queryAvailableServers(function(serverlist){
     // Empty array that holds the server information
     var serverArray = [];
@@ -179,7 +180,7 @@ queryAvailableServers(function(serverlist){
             // Abort if callback is
             if (!data) return callback();
 
-            console.log(data);
+            // console.log(data);
 
             // Push to serverDetails
             serverArray.push(data);
