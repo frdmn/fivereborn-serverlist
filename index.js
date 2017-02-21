@@ -6,9 +6,9 @@ var dgram = require('dgram');
 var fivem_host = "151.80.44.223";
 var fivem_port = "30110";
 
-// Basic configuration
-var masterclient_timeout = 1000 * 1;
-var client_timeout = 1000 * 0.2;
+// Timout configuration
+var masterclient_timeout = 1000;
+var client_timeout = 200;
 
 // Function to convert an integer into an IP string (X.X.X.X)
 function ip_to_str(ip_int){
