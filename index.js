@@ -52,7 +52,7 @@ var queryAvailableServers = function(callback) {
     header = new Buffer.concat([serial, command]);
 
     // Empty array that holds server+port combinations
-    var serverList = [];
+    var serverListArray = [];
 
     // Create UDP socket
     var masterclient = dgram.createSocket('udp4');
@@ -76,7 +76,7 @@ var queryAvailableServers = function(callback) {
 
             // Skip on "EOT\0\0\0" (0x454f5400)
             if (ip !== 0x454f5400) {
-                serverList.push(ipStr + ':' + port)
+                serverListArray.push(ipStr + ':' + port)
             }
         }
     });
@@ -84,7 +84,7 @@ var queryAvailableServers = function(callback) {
     // Set timeout of masterclientTimeout
     var timeout = setTimeout(function() {
         masterclient.close();
-        callback(serverList);
+        callback(serverListArray);
     }, masterclientTimeout);
 };
 
@@ -125,7 +125,7 @@ var getServerInfo = function(server, port, callback) {
     // Store current time to meassure response time of request
     var clientTimer = new Date();
 
-    var serverDetails = {
+    var serverDetailObject = {
         success: false,
         responsetime: 0,
         data: {}
@@ -140,9 +140,9 @@ var getServerInfo = function(server, port, callback) {
     // Set timeout of clientTimeout
     var timeout = setTimeout(function() {
         client.close();
-        serverDetails.responsetime = clientTimeout;
-        serverDetails.data.error = 'Timeout of ' + clientTimeout + ' exceeded.';
-        callback(serverDetails);
+        serverDetailObject.responsetime = clientTimeout;
+        serverDetailObject.data.error = 'Timeout of ' + clientTimeout + ' exceeded.';
+        callback(serverDetailObject);
     }, clientTimeout);
 
     // Process response from server
@@ -154,7 +154,7 @@ var getServerInfo = function(server, port, callback) {
         var parts = message.toString().split('\\');
 
         // Inject responsetime and empty data object
-        serverDetails.responsetime = new Date() - clientTimer;
+        serverDetailObject.responsetime = new Date() - clientTimer;
 
         // For each element, even = key; off = value
         for(var i = 0; i < parts.length; i += 2) {
@@ -162,20 +162,20 @@ var getServerInfo = function(server, port, callback) {
                 value = parts[i+1];
 
             // Transfer value into key
-            serverDetails.data[key] = value;
+            serverDetailObject.data[key] = value;
         }
 
-        serverDetails.success = true;
+        serverDetailObject.success = true;
 
         // Close connection, clear timer and call callback
         client.close();
         clearTimeout(timeout);
-        callback(serverDetails);
+        callback(serverDetailObject);
     });
 };
 
 // Empty object that holds the JSON result
-var serversObject = {
+var resultObject = {
     success: false,
     timestamp: "",
     runtime: 0,
@@ -187,7 +187,7 @@ var totalTimer = new Date();
 
 // Run function to get all servers
 queryAvailableServers(function(serverlist){
-    serversObject.success = true;
+    resultObject.success = true;
 
     // For each server, execute getServerInfo (synchronously)
     async.forEachSeries(serverlist, function(server, callback) {
@@ -202,17 +202,17 @@ queryAvailableServers(function(serverlist){
             if (!data) return callback();
 
             // Push to serverDetails
-            serversObject.data[server + ':' + port] = data;
+            resultObject.data[server + ':' + port] = data;
             callback();
         });
     }, function(err) {
         if (err) throw err;
 
         // Inject update timestamp and execution runtime
-        serversObject.timestamp = new Date();
-        serversObject.runtime = new Date() - totalTimer;
+        resultObject.timestamp = new Date();
+        resultObject.runtime = new Date() - totalTimer;
 
         // Print result as formatted JSON
-        console.log(JSON.stringify(serversObject, null, 4));
+        console.log(JSON.stringify(resultObject, null, 4));
     });
 });
