@@ -1,7 +1,8 @@
 // Require modules
 var raw = require ('raw-socket'),
     dgram = require('dgram'),
-    async = require('async');
+    async = require('async'),
+    request = require('request');
 
 // FiveM dpmaster server
 var fivemHost = 'updater.fivereborn.com',
@@ -9,7 +10,8 @@ var fivemHost = 'updater.fivereborn.com',
 
 // Timout configuration
 var masterclientTimeout = 1000,
-    clientTimeout = 200;
+    clientTimeout = 200,
+    httpTimeout = 100;
 
 // Function to convert an integer into an IP string (X.X.X.X)
 
@@ -90,7 +92,7 @@ var queryAvailableServers = function(callback) {
 
 /**
  * Get general information of specific game server. Returns an
- * object that holds the data
+ * object that holds the data.
  * @param  {String}   server
  * @param  {String}   port
  * @param  {Function} callback
@@ -176,6 +178,60 @@ var getServerInfo = function(server, port, callback) {
     });
 };
 
+/**
+ * Get resource information of specific game server. Returns an
+ * object that holds the data.
+ * @param  {String}   server
+ * @param  {String}   port
+ * @param  {Function} callback
+ * @return {Object}
+ * @example
+ * {
+ *   resources: [
+ *     'mapmanager',
+ *     'CarCleanUp',
+ *     'Ivvepivve',
+ *     'NeverWanted',
+ *     'baseevents',
+ *     'chat',
+ *     'hardcap',
+ *     'rconlog',
+ *     'scoreboard',
+ *     'spawnmanager',
+ *     'keks',
+ *     'carcrash',
+ *     'essentialmode',
+ *     'fivem',
+ *     'fivem-map-skater',
+ *     'handsup',
+ *     'mods',
+ *     'mxhandcuff',
+ *     'siren',
+ *     'whitelist'
+ *   ],
+ *   server: '1.0.0.0 (git 8d735e1)',
+ *   version: -2413476
+ * }
+ */
+var getServerResource = function (server, port, callback){
+    // Empty object to store data
+    var resultObject = {};
+
+    // Send GET request with configured httpTimeout
+    request('http://' + server + ':' + port + '/info.json', {timeout: httpTimeout}, function (error, response, body) {
+        // Check for success
+        if (!error && response.statusCode == 200) {
+            // Parse JSON
+            var parsedBody = JSON.parse(body);
+            // Return parsedBody to callback
+            return callback(parsedBody);
+        } else {
+            // Otherwise, return false
+            return callback(false);
+        }
+    })
+};
+
 // Empty object that holds the JSON result
 var resultObject = {
     success: false,
@@ -201,12 +257,25 @@ queryAvailableServers(function(serverlist){
 
         // Get server information for current server
         getServerInfo(server, port, function(data){
-            // Abort if callback is false
-            if (!data) return callback();
-
             // Push to resultObject
             resultObject.data[server + ':' + port] = data;
-            callback();
+
+            // Abort if invalid data
+            if (!data || data.success === false) {
+                return callback()
+            };
+
+            // Try to parse server resources using HTTP (http://<server>:<port>/info.json) API
+            getServerResource(server, port, function(data){
+                // Abort if invalid data
+                if (!data) {
+                    return callback()
+                } else {
+                    // Push to resultObject
+                    resultObject.data[server + ':' + port].data.resources =  data;
+                    return callback();
+                }
+            });
         });
     }, function(err) {
         // Throw possible errors
