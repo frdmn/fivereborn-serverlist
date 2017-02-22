@@ -1,0 +1,29 @@
+{
+  "name": "fivereborn-serverlist",
+  "version": "1.0.0",
+  "description": "Query FiveReborn master server for a list of available game servers",
+  "main": "index.js",
+  "dependencies": {
+    "async": "^2.1.5",
+    "raw-socket": "^1.5.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frdmn/fivereborn-serverlist.git"
+  },
+  "keywords": [
+    "gta",
+    "fivereborn",
+    "dpmaster"
+  ],
+  "author": "Jonas Friedmann <j@frd.mn>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/frdmn/fivereborn-serverlist/issues"
+  },
+  "homepage": "https://github.com/frdmn/fivereborn-serverlist#readme"
+}
