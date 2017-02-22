@@ -81,7 +81,7 @@ var queryAvailableServers = function(callback) {
         }
     });
 
-    // Set timeout of 1 second
+    // Set timeout of masterclientTimeout
     var timeout = setTimeout(function() {
         masterclient.close();
         callback(serverList);
@@ -125,16 +125,24 @@ var getServerInfo = function(server, port, callback) {
     // Store current time to meassure response time of request
     var clientTimer = new Date();
 
+    var serverDetails = {
+        success: false,
+        responsetime: 0,
+        data: {}
+    };
+
     // Send UDP packet
     client.send(header, 0, header.length, port, server, function(err, bytes) {
         if (err) throw err;
         // console.log('UDP message sent to ' + server +':'+ port);
     });
 
-    // Set timeout of 1 second
+    // Set timeout of clientTimeout
     var timeout = setTimeout(function() {
         client.close();
-        callback(false);
+        serverDetails.responsetime = clientTimeout;
+        serverDetails.data.error = 'Timeout of ' + clientTimeout + ' exceeded.';
+        callback(serverDetails);
     }, clientTimeout);
 
     // Process response from server
@@ -143,10 +151,9 @@ var getServerInfo = function(server, port, callback) {
         message = message.slice(18);
 
         // Split buffer by "\\" separator
-        var parts = message.toString().split('\\'),
-            serverDetails = {};
+        var parts = message.toString().split('\\');
 
-        // Inject responsetime
+        // Inject responsetime and empty data object
         serverDetails.responsetime = new Date() - clientTimer;
 
         // For each element, even = key; off = value
@@ -155,8 +162,10 @@ var getServerInfo = function(server, port, callback) {
                 value = parts[i+1];
 
             // Transfer value into key
-            serverDetails[key] = value;
+            serverDetails.data[key] = value;
         }
+
+        serverDetails.success = true;
 
         // Close connection, clear timer and call callback
         client.close();
@@ -165,9 +174,11 @@ var getServerInfo = function(server, port, callback) {
     });
 };
 
-// Empty array that holds the server information
+// Empty object that holds the JSON result
 var serversObject = {
     success: false,
+    timestamp: "",
+    runtime: 0,
     data: {}
 };
 
@@ -189,8 +200,6 @@ queryAvailableServers(function(serverlist){
         getServerInfo(server, port, function(data){
             // Abort if callback is false
             if (!data) return callback();
-
-            // console.log(data);
 
             // Push to serverDetails
             serversObject.data[server + ':' + port] = data;
