@@ -6,9 +6,16 @@ Simple NodeJS application to query the (dpmaster based) *FiveReborn* / *FiveM* /
 
 1. Make sure you've installed all requirements
 2. Clone this repository:
-  `git clone https://github.com/frdmn/fivereborn-serverlist`
+
+    ```
+    git clone https://github.com/frdmn/fivereborn-serverlist
+    ```
+
 3. Install the dependencies using `npm`:
-  `npm install`
+
+    ```
+    npm install
+    ```
 
 ## Usage
 
