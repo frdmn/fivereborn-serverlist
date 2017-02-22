@@ -4,28 +4,28 @@ var raw = require ('raw-socket'),
     async = require('async');
 
 // FiveM dpmaster server
-var fivem_host = 'updater.fivereborn.com',
-    fivem_port = '30110';
+var fivemHost = 'updater.fivereborn.com',
+    fivemPort = '30110';
 
 // Timout configuration
-var masterclient_timeout = 1000,
-    client_timeout = 200;
+var masterclientTimeout = 1000,
+    clientTimeout = 200;
 
 // Function to convert an integer into an IP string (X.X.X.X)
 
 /**
  * Convert an integer into an IP string (x.x.x.x)
- * @param  {Integer} ip_int
+ * @param  {Integer} ipInt
  * @return {String}
  */
-var ip_to_str = function(ip_int){
-    var ip_str = ((ip_int >> 24) & 0xFF).toString() + '.';
-    ip_str += ((ip_int >> 16) & 0xFF).toString() + '.';
-    ip_str += ((ip_int >>  8) & 0xFF).toString() + '.';
-    ip_str += ((ip_int >>  0) & 0xFF).toString();
+var ipToStr = function(ipInt){
+    var ipStr = ((ipInt >> 24) & 0xFF).toString() + '.';
+    ipStr += ((ipInt >> 16) & 0xFF).toString() + '.';
+    ipStr += ((ipInt >>  8) & 0xFF).toString() + '.';
+    ipStr += ((ipInt >>  0) & 0xFF).toString();
 
     // Return constructed string
-    return ip_str;
+    return ipStr;
 }
 
 /**
@@ -58,9 +58,9 @@ var queryAvailableServers = function(callback) {
     var masterclient = dgram.createSocket('udp4');
 
     // Send UDP packet
-    masterclient.send(header, 0, header.length, fivem_port, fivem_host, function(err, bytes) {
+    masterclient.send(header, 0, header.length, fivemPort, fivemHost, function(err, bytes) {
         if (err) throw err;
-        // console.log('UDP message sent to ' + fivem_host +':'+ fivem_port);
+        // console.log('UDP message sent to ' + fivemHost +':'+ fivemPort);
     });
 
     // Process response from server
@@ -72,11 +72,11 @@ var queryAvailableServers = function(callback) {
             var ip = message.readUInt32BE(i + 1);
             var port = message.readUInt16BE(i + 5);
             // Convert integer IP into string
-            var ip_str = ip_to_str(ip);
+            var ipStr = ipToStr(ip);
 
-            // Stop on "EOT\0\0\0"
+            // Skip on "EOT\0\0\0" (0x454f5400)
             if (ip !== 0x454f5400) {
-                serverList.push(ip_str + ':' + port)
+                serverList.push(ipStr + ':' + port)
             }
         }
     });
@@ -85,7 +85,7 @@ var queryAvailableServers = function(callback) {
     var timeout = setTimeout(function() {
         masterclient.close();
         callback(serverList);
-    }, masterclient_timeout);
+    }, masterclientTimeout);
 };
 
 /**
@@ -135,7 +135,7 @@ var getServerInfo = function(server, port, callback) {
     var timeout = setTimeout(function() {
         client.close();
         callback(false);
-    }, client_timeout);
+    }, clientTimeout);
 
     // Process response from server
     client.on('message', function (message, remote) {
