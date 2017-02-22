@@ -42,14 +42,14 @@ var ipToStr = function(ipInt){
  */
 var queryAvailableServers = function(callback) {
     //  Header elements
-    var padding = new Buffer(4),
+    var serial = new Buffer(4),
         command = new Buffer('getservers GTA5 4 full empty');
 
-    // Fill padding with \xFF
-    padding.writeUInt32LE(0xFFFFFFFF);
+    // Fill serial with \xFF
+    serial.writeUInt32LE(0xFFFFFFFF);
 
     // Combine into one header
-    header = new Buffer.concat([padding, command]);
+    header = new Buffer.concat([serial, command]);
 
     // Empty array that holds server+port combinations
     var serverList = [];
@@ -110,14 +110,14 @@ var queryAvailableServers = function(callback) {
  */
 var getServerInfo = function(server, port, callback) {
     //  Header elements
-    var padding = new Buffer(4),
+    var serial = new Buffer(4),
         command = new Buffer('getinfo r4nd0m');
 
-    // Fill padding with \xFF
-    padding.writeUInt32LE(0xFFFFFFFF);
+    // Fill serial with \xFF
+    serial.writeUInt32LE(0xFFFFFFFF);
 
     // Combine into one header
-    header = new Buffer.concat([padding, command]);
+    header = new Buffer.concat([serial, command]);
 
     // Create UDP socket
     var client = dgram.createSocket('udp4');
