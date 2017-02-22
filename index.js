@@ -123,7 +123,7 @@ var getServerInfo = function(server, port, callback) {
     var client = dgram.createSocket('udp4');
 
     // Store current time to meassure response time of request
-    var start = new Date();
+    var clientTimer = new Date();
 
     // Send UDP packet
     client.send(header, 0, header.length, port, server, function(err, bytes) {
@@ -147,7 +147,7 @@ var getServerInfo = function(server, port, callback) {
             serverDetails = {};
 
         // Inject responsetime
-        serverDetails.responsetime = new Date() - start;
+        serverDetails.responsetime = new Date() - clientTimer;
 
         // For each element, even = key; off = value
         for(var i = 0; i < parts.length; i += 2) {
