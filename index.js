@@ -84,7 +84,7 @@ var queryAvailableServers = function(callback) {
     // Set timeout of masterclientTimeout
     var timeout = setTimeout(function() {
         masterclient.close();
-        callback(serverListArray);
+        return callback(serverListArray);
     }, masterclientTimeout);
 };
 
@@ -143,7 +143,7 @@ var getServerInfo = function(server, port, callback) {
         client.close();
         serverDetailObject.responsetime = clientTimeout;
         serverDetailObject.data.error = 'Timeout of ' + clientTimeout + ' exceeded.';
-        callback(serverDetailObject);
+        return callback(serverDetailObject);
     }, clientTimeout);
 
     // Process response from server
@@ -172,7 +172,7 @@ var getServerInfo = function(server, port, callback) {
         // Close connection, clear timer and call callback
         client.close();
         clearTimeout(timeout);
-        callback(serverDetailObject);
+        return callback(serverDetailObject);
     });
 };
 
