@@ -165,10 +165,18 @@ var getServerInfo = function(server, port, callback) {
     });
 };
 
+// Empty array that holds the server information
+var serversObject = {
+    success: false,
+    data: {}
+};
+
+// Store current time to meassure response time of request
+var totalTimer = new Date();
+
 // Run function to get all servers
 queryAvailableServers(function(serverlist){
-    // Empty array that holds the server information
-    var serversObject = {};
+    serversObject.success = true;
 
     // For each server, execute getServerInfo (synchronously)
     async.forEachSeries(serverlist, function(server, callback) {
@@ -185,11 +193,16 @@ queryAvailableServers(function(serverlist){
             // console.log(data);
 
             // Push to serverDetails
-            serversObject[server + ':' + port] = data;
+            serversObject.data[server + ':' + port] = data;
             callback();
         });
     }, function(err) {
         if (err) throw err;
+
+        // Inject update timestamp and execution runtime
+        serversObject.timestamp = new Date();
+        serversObject.runtime = new Date() - totalTimer;
+
         // Print result as formatted JSON
         console.log(JSON.stringify(serversObject, null, 4));
     });
