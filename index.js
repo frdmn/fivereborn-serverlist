@@ -142,7 +142,7 @@ var getServerInfo = function(server, port, callback) {
     var timeout = setTimeout(function() {
         client.close();
         serverDetailObject.responsetime = clientTimeout;
-        serverDetailObject.data.error = 'Timeout of ' + clientTimeout + ' exceeded.';
+        serverDetailObject.data.error = 'Timeout of ' + clientTimeout + ' ms exceeded.';
         return callback(serverDetailObject);
     }, clientTimeout);
 
