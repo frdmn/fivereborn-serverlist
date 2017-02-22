@@ -125,6 +125,7 @@ var getServerInfo = function(server, port, callback) {
     // Store current time to meassure response time of request
     var clientTimer = new Date();
 
+    // Empty object that holds the server details
     var serverDetailObject = {
         success: false,
         responsetime: 0,
@@ -165,6 +166,7 @@ var getServerInfo = function(server, port, callback) {
             serverDetailObject.data[key] = value;
         }
 
+        // Set success to "true"
         serverDetailObject.success = true;
 
         // Close connection, clear timer and call callback
@@ -187,6 +189,7 @@ var totalTimer = new Date();
 
 // Run function to get all servers
 queryAvailableServers(function(serverlist){
+    // Set success to "true"
     resultObject.success = true;
 
     // For each server, execute getServerInfo (synchronously)
@@ -201,11 +204,12 @@ queryAvailableServers(function(serverlist){
             // Abort if callback is false
             if (!data) return callback();
 
-            // Push to serverDetails
+            // Push to resultObject
             resultObject.data[server + ':' + port] = data;
             callback();
         });
     }, function(err) {
+        // Throw possible errors
         if (err) throw err;
 
         // Inject update timestamp and execution runtime
