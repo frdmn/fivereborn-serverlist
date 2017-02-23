@@ -8,8 +8,8 @@ var fivemHost = 'updater.fivereborn.com',
 
 // Timout configuration
 var masterclientTimeout = 1000,
-    clientTimeout = 200,
-    httpTimeout = 100;
+    clientTimeout = 1000,
+    httpTimeout = 500;
 
 // Empty object that holds the JSON result
 var resultObject = {
