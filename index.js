@@ -1,6 +1,6 @@
 // Require modules
 var async = require('async'),
-    functions = require('./lib/functions');
+    fivem = require('./lib/fivem');
 
 // FiveM dpmaster server
 var fivemHost = 'updater.fivereborn.com',
@@ -23,7 +23,7 @@ var resultObject = {
 var totalTimer = new Date();
 
 // Run function to get all servers
-functions.queryAvailableServers({server: fivemHost, port: fivemPort, timeout: masterclientTimeout}, function(serverlist){
+fivem.queryAvailableServers({server: fivemHost, port: fivemPort, timeout: masterclientTimeout}, function(serverlist){
     // Set success to "true"
     resultObject.success = true;
 
@@ -35,7 +35,7 @@ functions.queryAvailableServers({server: fivemHost, port: fivemPort, timeout: ma
             port = socket[1];
 
         // Get server information for current server
-        functions.getServerInfo({timeout: clientTimeout}, server, port, function(data){
+        fivem.getServerInfo({timeout: clientTimeout}, server, port, function(data){
             // Push to resultObject
             resultObject.data[server + ':' + port] = data;
 
@@ -45,7 +45,7 @@ functions.queryAvailableServers({server: fivemHost, port: fivemPort, timeout: ma
             };
 
             // Try to parse server resources using HTTP (http://<server>:<port>/info.json) API
-            functions.getServerResource({timeout: httpTimeout}, server, port, function(data){
+            fivem.getServerResource({timeout: httpTimeout}, server, port, function(data){
                 // Abort if invalid data
                 if (!data) {
                     return callback()
