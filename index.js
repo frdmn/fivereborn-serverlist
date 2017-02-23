@@ -23,7 +23,7 @@ var resultObject = {
 var totalTimer = new Date();
 
 // Run function to get all servers
-functions.queryAvailableServers(function(serverlist){
+functions.queryAvailableServers({server: fivemHost, port: fivemPort, timeout: masterclientTimeout}, function(serverlist){
     // Set success to "true"
     resultObject.success = true;
 
@@ -35,7 +35,7 @@ functions.queryAvailableServers(function(serverlist){
             port = socket[1];
 
         // Get server information for current server
-        functions.getServerInfo(server, port, function(data){
+        functions.getServerInfo({timeout: clientTimeout}, server, port, function(data){
             // Push to resultObject
             resultObject.data[server + ':' + port] = data;
 
@@ -45,7 +45,7 @@ functions.queryAvailableServers(function(serverlist){
             };
 
             // Try to parse server resources using HTTP (http://<server>:<port>/info.json) API
-            functions.getServerResource(server, port, function(data){
+            functions.getServerResource({timeout: httpTimeout}, server, port, function(data){
                 // Abort if invalid data
                 if (!data) {
                     return callback()
