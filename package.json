@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "async": "^2.1.5",
+    "commander": "^2.9.0",
     "raw-socket": "^1.5.1",
     "request": "^2.79.0"
   },
