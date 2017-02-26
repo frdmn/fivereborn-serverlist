@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 // Require modules
 var async = require('async'),
     cmdr = require('commander'),
