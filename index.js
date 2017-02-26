@@ -20,10 +20,16 @@ var resultObject = {
     data: {}
 };
 
-var stringToJSON = function(string){
-    return JSON.stringify(string, null, 4);
+/**
+ * Turn input object into prettyfied JSON string
+ * @param  {Object|Array} object
+ * @return {String}
+ */
+var objectToJSON = function(object){
+    return JSON.stringify(object, null, 4);
 };
 
+// Initialize commander.js
 cmdr
     .option('-s, --servers', 'List all available game server nodes')
     .option('-i, --info <server:port>', 'Get general information of a specific game server')
@@ -47,7 +53,7 @@ if (cmdr.rawArgs.length < 3 ){
 // List all servers, if '-s' is set
 if (cmdr.servers){
     fivem.queryAvailableServers({server: fivemHost, port: fivemPort, timeout: masterclientTimeout}, function(serverlist){
-        console.log(stringToJSON(serverlist));
+        console.log(objectToJSON(serverlist));
         process.exit(0);
     });
 }
@@ -61,7 +67,7 @@ if (cmdr.info){
 
     // Get server information for current server
     fivem.getServerInfo({timeout: clientTimeout}, server, port, function(serverinfo){
-        console.log(stringToJSON(serverinfo));
+        console.log(objectToJSON(serverinfo));
         if(serverinfo && serverinfo.success){
             process.exit(0);
         } else {
@@ -79,7 +85,7 @@ if (cmdr.resources){
 
     // Try to parse server resources using HTTP (http://<server>:<port>/info.json) API
     fivem.getServerResource({timeout: httpTimeout}, server, port, function(serverresources){
-        console.log(stringToJSON(serverresources));
+        console.log(objectToJSON(serverresources));
         if(serverresources && serverresources.success){
             process.exit(0);
         } else {
