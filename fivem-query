@@ -122,7 +122,7 @@ if (cmdr.players){
 // Get chat logs, if '-c' is set
 if (cmdr.chat){
     // Split by ":" and store in variables
-    var socket = cmdr.logs.split(':'),
+    var socket = cmdr.chat.split(':'),
         server = socket[0],
         port = socket[1];
 
