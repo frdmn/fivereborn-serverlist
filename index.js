@@ -72,6 +72,7 @@ if (cmdr.info){
     // Get server information for current server
     fivem.getServerInfo({timeout: clientTimeout}, server, port, function(serverinfo){
         console.log(objectToJSON(serverinfo));
+        // Check for success to exit with proper status code
         if(serverinfo && serverinfo.success){
             process.exit(0);
         } else {
@@ -90,6 +91,7 @@ if (cmdr.resources){
     // Try to parse server resources using HTTP
     fivem.getServerResource({timeout: httpTimeout}, server, port, function(serverresources){
         console.log(objectToJSON(serverresources));
+        // Check for success to exit with proper status code
         if(serverresources && serverresources.success){
             process.exit(0);
         } else {
@@ -108,6 +110,7 @@ if (cmdr.players){
     // Get connected players using HTTP
     fivem.getConnectedPlayers({timeout: httpTimeout}, server, port, function(serverplayers){
         console.log(objectToJSON(serverplayers));
+        // Check for success to exit with proper status code
         if(serverplayers && serverplayers.success){
             process.exit(0);
         } else {
@@ -125,18 +128,27 @@ if (cmdr.chat){
 
     // Get connected players using HTTP
     fivem.getEventLog({timeout: httpTimeout}, server, port, function(serverevents){
+        // Check for success
         if(serverevents && serverevents.success){
             var serverchat = [];
 
+            // For each event entry
             for(var i = 0; i < serverevents.data.length; i += 2) {
+                // Check if event type is "chatMessage"
                 if (serverevents.data[i].msgType === 'chatMessage') {
+                    // If so, push event to serverchat array
                     serverchat.push(serverevents.data[i]);
                 }
             }
+
+            // Overwrite events with chat events in serverevents.data
             serverevents.data = serverchat;
+
+            // Output result and exit
             console.log(objectToJSON(serverevents));
             process.exit(0);
         } else {
+            // Output result and exit
             console.log(objectToJSON(serverevents));
             process.exit(1);
         }
