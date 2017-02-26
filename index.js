@@ -35,6 +35,7 @@ cmdr
     .option('-i, --info <server:port>', 'Get general information of a specific game server')
     .option('-r, --resources <server:port>', 'List server resources (server version, info version, git revision) of specific server')
     .option('-p, --players <server:port>', 'List connected players of specific server')
+    .option('-c, --chat <server:port>', 'Get latest chat logs')
     .on('--help', function(){
         console.log('  Examples:');
         console.log('');
@@ -42,6 +43,7 @@ cmdr
         console.log('    $ fivem-query -i 203.0.113.2:30130');
         console.log('    $ fivem-query -r 192.0.2.199:30130');
         console.log('    $ fivem-query -p 198.51.100.43:30130');
+        console.log('    $ fivem-query -c 203.0.113.43:30132');
         console.log('');
       })
     .parse(process.argv);
@@ -96,7 +98,7 @@ if (cmdr.resources){
     });
 }
 
-// List connected players, if '-' is set
+// List connected players, if '-p' is set
 if (cmdr.players){
     // Split by ":" and store in variables
     var socket = cmdr.players.split(':'),
@@ -109,6 +111,33 @@ if (cmdr.players){
         if(serverplayers && serverplayers.success){
             process.exit(0);
         } else {
+            process.exit(1);
+        }
+    });
+}
+
+// Get chat logs, if '-c' is set
+if (cmdr.chat){
+    // Split by ":" and store in variables
+    var socket = cmdr.logs.split(':'),
+        server = socket[0],
+        port = socket[1];
+
+    // Get connected players using HTTP
+    fivem.getEventLog({timeout: httpTimeout}, server, port, function(serverevents){
+        if(serverevents && serverevents.success){
+            var serverchat = [];
+
+            for(var i = 0; i < serverevents.data.length; i += 2) {
+                if (serverevents.data[i].msgType === 'chatMessage') {
+                    serverchat.push(serverevents.data[i]);
+                }
+            }
+            serverevents.data = serverchat;
+            console.log(objectToJSON(serverevents));
+            process.exit(0);
+        } else {
+            console.log(objectToJSON(serverevents));
             process.exit(1);
         }
     });
