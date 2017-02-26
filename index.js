@@ -85,7 +85,7 @@ if (cmdr.resources){
         server = socket[0],
         port = socket[1];
 
-    // Try to parse server resources using HTTP (http://<server>:<port>/info.json) API
+    // Try to parse server resources using HTTP
     fivem.getServerResource({timeout: httpTimeout}, server, port, function(serverresources){
         console.log(objectToJSON(serverresources));
         if(serverresources && serverresources.success){
