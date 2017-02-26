@@ -34,12 +34,14 @@ cmdr
     .option('-s, --servers', 'List all available game server nodes')
     .option('-i, --info <server:port>', 'Get general information of a specific game server')
     .option('-r, --resources <server:port>', 'List server resources (server version, info version, git revision) of specific server')
+    .option('-p, --players <server:port>', 'List connected players of specific server')
     .on('--help', function(){
         console.log('  Examples:');
         console.log('');
         console.log('    $ fivem-query -s');
         console.log('    $ fivem-query -i 203.0.113.2:30130');
         console.log('    $ fivem-query -r 192.0.2.199:30130');
+        console.log('    $ fivem-query -p 198.51.100.43:30130');
         console.log('');
       })
     .parse(process.argv);
@@ -87,6 +89,24 @@ if (cmdr.resources){
     fivem.getServerResource({timeout: httpTimeout}, server, port, function(serverresources){
         console.log(objectToJSON(serverresources));
         if(serverresources && serverresources.success){
+            process.exit(0);
+        } else {
+            process.exit(1);
+        }
+    });
+}
+
+// List connected players, if '-' is set
+if (cmdr.players){
+    // Split by ":" and store in variables
+    var socket = cmdr.players.split(':'),
+        server = socket[0],
+        port = socket[1];
+
+    // Get connected players using HTTP
+    fivem.getConnectedPlayers({timeout: httpTimeout}, server, port, function(serverplayers){
+        console.log(objectToJSON(serverplayers));
+        if(serverplayers && serverplayers.success){
             process.exit(0);
         } else {
             process.exit(1);
